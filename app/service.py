@@ -17,64 +17,51 @@ class OrchestratorService:
     @staticmethod
     def process(query: str, file_path: str = None):
 
-        if not query or not query.strip():
-            return {
-                "status": "error",
-                "message": "empty query"
-            }
+        if not query.strip():
+            return {"status": "error", "message": "empty query"}
 
         try:
 
-            # Step 1: Plan
             strategy, tasks = Planner.create_plan(query)
-
-            # Step 2: Route
             routing = Router.route(tasks)
 
-            # Step 3: Execute agents
             agent_outputs = {}
 
-            for route in routing:
+            for r in routing:
 
-                task_id = route["task_id"]
-                agent_name = route["agent"]
+                agent = r["agent"]
 
-                if agent_name == "rag_agent":
-                    output = RAGAgent.execute(query, file_path)
+                if agent == "rag_agent":
+                    out = RAGAgent.execute(query, file_path)
 
-                elif agent_name == "risk_agent":
-                    output = RiskAgent.execute(query)
+                elif agent == "risk_agent":
+                    out = RiskAgent.execute(query)
 
-                elif agent_name == "action_agent":
-                    output = ActionAgent.execute(query)
+                elif agent == "action_agent":
+                    out = ActionAgent.execute(query)
 
                 else:
-                    output = "unsupported agent"
+                    out = "unsupported"
 
-                agent_outputs[task_id] = {
-                    "agent": agent_name,
-                    "output": output
+                if isinstance(out, str) and out.startswith("error"):
+                    return {"status": "error", "message": out}
+
+                agent_outputs[r["task_id"]] = {
+                    "agent": agent,
+                    "output": out
                 }
 
-            # Step 4: Aggregate
             structured = Aggregator.collect(agent_outputs)
 
-            # Step 5: Final summarization
-            final_answer = SummarizerAgent.execute(structured)
+            final = SummarizerAgent.execute(structured)
 
             return {
                 "status": "success",
                 "strategy": strategy,
-                "tasks": tasks,
-                "final_output": final_answer,
+                "final_output": final,
                 "structured": structured
             }
 
         except Exception as e:
-
-            logger.error(f"Execution failed: {e}")
-
-            return {
-                "status": "error",
-                "message": str(e)
-            }
+            logger.error(e)
+            return {"status": "error", "message": str(e)}
