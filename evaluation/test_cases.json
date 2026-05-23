@@ -1,0 +1,11 @@
+[
+  {
+    "id": "pm_001",
+    "query": "Summarize project and highlight risks and next actions",
+    "expected_tasks": ["summarize", "risk_analysis", "action_recommendation"],
+    "expected_agents": ["rag_agent", "risk_agent", "action_agent"],
+    "expected_risks": ["delay", "dependency", "resource"],
+    "expected_actions": ["mitigate", "escalate", "plan"],
+    "expected_output": "Summary with risks and actions"
+  }
+]
