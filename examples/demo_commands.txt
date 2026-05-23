@@ -1,0 +1,16 @@
+# Install
+pip install -r requirements.txt
+
+# Set API key
+export GEMINI_API_KEY=your_key
+
+# Run CLI
+
+python -m app.cli \
+--query "Summarize project and highlight risks and next actions"
+
+# With document
+
+python -m app.cli \
+--query "Summarize project and highlight risks" \
+--file data/sample.pdf
