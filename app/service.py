@@ -1,9 +1,11 @@
 from app.orchestrator.planner import Planner
 from app.orchestrator.router import Router
+from app.orchestrator.aggregator import Aggregator
 
 from app.agents.rag_agent import RAGAgent
 from app.agents.risk_agent import RiskAgent
 from app.agents.action_agent import ActionAgent
+from app.agents.summarizer_agent import SummarizerAgent
 
 from app.utils.logger import get_logger
 
@@ -23,10 +25,13 @@ class OrchestratorService:
 
         try:
 
+            # Step 1: Plan
             strategy, tasks = Planner.create_plan(query)
 
+            # Step 2: Route
             routing = Router.route(tasks)
 
+            # Step 3: Execute agents
             agent_outputs = {}
 
             for route in routing:
@@ -51,12 +56,18 @@ class OrchestratorService:
                     "output": output
                 }
 
+            # Step 4: Aggregate
+            structured = Aggregator.collect(agent_outputs)
+
+            # Step 5: Final summarization
+            final_answer = SummarizerAgent.execute(structured)
+
             return {
                 "status": "success",
                 "strategy": strategy,
                 "tasks": tasks,
-                "routing": routing,
-                "agent_outputs": agent_outputs
+                "final_output": final_answer,
+                "structured": structured
             }
 
         except Exception as e:
