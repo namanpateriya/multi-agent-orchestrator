@@ -14,19 +14,22 @@ class Aggregator:
             "actions": ""
         }
 
-        for task_id, data in agent_outputs.items():
+        for _, data in agent_outputs.items():
 
             agent = data["agent"]
             output = data["output"]
 
+            if not output:
+                continue
+
             if agent == "rag_agent":
-                structured["summary"] = output
+                structured["summary"] += "\n" + output
 
             elif agent == "risk_agent":
-                structured["risks"] = output
+                structured["risks"] += "\n" + output
 
             elif agent == "action_agent":
-                structured["actions"] = output
+                structured["actions"] += "\n" + output
 
         logger.info("Aggregation complete")
 
