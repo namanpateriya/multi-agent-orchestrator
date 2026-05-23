@@ -6,32 +6,35 @@ client = GeminiClient()
 class SummarizerAgent:
 
     @staticmethod
-    def execute(structured_data):
+    def execute(data):
 
         prompt = f"""
-You are a senior program manager preparing an executive update.
+You are a senior program manager.
 
-Combine the following inputs into a structured response:
+STRICT RULES:
+- Use ONLY provided inputs
+- Do NOT add new info
+- If missing, say "Not available"
 
 Summary:
-{structured_data.get("summary", "")}
+{data.get("summary", "")}
 
 Risks:
-{structured_data.get("risks", "")}
+{data.get("risks", "")}
 
 Actions:
-{structured_data.get("actions", "")}
+{data.get("actions", "")}
 
-Output format:
+Output:
 
 Summary:
-<concise summary>
+...
 
 Key Risks:
-- ...
+...
 
 Recommended Actions:
-- ...
+...
 """
 
         return client.generate(prompt)
