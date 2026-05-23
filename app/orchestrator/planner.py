@@ -8,39 +8,24 @@ class Planner:
     @staticmethod
     def create_plan(query: str):
 
-        query_lower = query.lower()
+        q = query.lower()
 
         tasks = []
 
-        # Rule-based planning (stable + deterministic)
+        if "summarize" in q or "summary" in q:
+            tasks.append({"task_id": "1", "type": "summarize"})
 
-        if "summarize" in query_lower:
-            tasks.append({
-                "task_id": "1",
-                "type": "summarize"
-            })
+        if any(k in q for k in ["risk", "issue", "blocker", "challenge"]):
+            tasks.append({"task_id": str(len(tasks)+1), "type": "risk_analysis"})
 
-        if "risk" in query_lower:
-            tasks.append({
-                "task_id": str(len(tasks) + 1),
-                "type": "risk_analysis"
-            })
+        if any(k in q for k in ["action", "next step", "recommend"]):
+            tasks.append({"task_id": str(len(tasks)+1), "type": "action_recommendation"})
 
-        if "action" in query_lower or "next step" in query_lower:
-            tasks.append({
-                "task_id": str(len(tasks) + 1),
-                "type": "action_recommendation"
-            })
-
-        # Default fallback
         if not tasks:
-            tasks.append({
-                "task_id": "1",
-                "type": "summarize"
-            })
+            tasks.append({"task_id": "1", "type": "summarize"})
 
         strategy = "multi_step" if len(tasks) > 1 else "single_step"
 
-        logger.info(f"Plan created: {tasks}")
+        logger.info(f"Plan: {tasks}")
 
         return strategy, tasks
