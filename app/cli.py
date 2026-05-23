@@ -6,8 +6,25 @@ from app.service import OrchestratorService
 
 def pretty_print(result):
 
-    print("\n=== RESULT ===\n")
-    print(json.dumps(result, indent=2))
+    print("\n=== MULTI-AGENT OUTPUT ===\n")
+
+    if result.get("status") != "success":
+        print("Error:", result.get("message"))
+        return
+
+    print("Strategy:", result.get("strategy"))
+
+    print("\n--- Summary ---")
+    print(result.get("structured", {}).get("summary", ""))
+
+    print("\n--- Risks ---")
+    print(result.get("structured", {}).get("risks", ""))
+
+    print("\n--- Actions ---")
+    print(result.get("structured", {}).get("actions", ""))
+
+    print("\n--- Full Output ---")
+    print(result.get("final_output", ""))
 
 
 def main():
