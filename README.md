@@ -1,20 +1,27 @@
 # Multi-Agent Orchestrator
 
-Multi-Agent Orchestrator is a purpose-driven AI system designed to simulate a Program Management Copilot using multiple collaborating agents.
+Multi-Agent Orchestrator is a purpose-driven AI system that simulates a Program Management Copilot using multiple collaborating agents.
 
-It demonstrates how complex queries can be decomposed, routed, executed, and aggregated into structured business insights.
+It combines:
+- task decomposition
+- agent-based execution
+- document-aware reasoning (RAG)
+- structured aggregation
+- evaluation and optimization
 
 ---
 
 # Features
 
-- Task decomposition using deterministic planning
-- Agent-based execution (multi-agent system)
-- Domain-specific agents for program management
-- Structured aggregation of outputs
-- Final executive-ready response generation
+- Deterministic task decomposition (planner)
+- Intelligent agent routing
+- Multi-agent execution (RAG, Risk, Action)
+- Real document-based RAG pipeline
+- Context-grounded reasoning
+- Structured aggregation layer
+- Executive-ready output generation
 - CLI and API support
-- Multi-agent evaluation and optimization framework
+- Multi-agent evaluation and optimization
 
 ---
 
@@ -43,6 +50,18 @@ Recommended Actions:
 
 ---
 
+# System Capabilities
+
+This system demonstrates:
+
+- task decomposition and orchestration
+- multi-agent collaboration
+- document-aware reasoning (RAG)
+- structured business insights generation
+- evaluation-driven AI improvement loop
+
+---
+
 # Architecture Overview
 
 ```text
@@ -53,7 +72,7 @@ Planner (task decomposition)
 Router (agent selection)
     ↓
 Agents Execute
-    ├── RAG Agent
+    ├── RAG Agent (real retrieval pipeline)
     ├── Risk Agent
     ├── Action Agent
     ↓
@@ -61,23 +80,30 @@ Aggregator
     ↓
 Summarizer Agent
     ↓
-Final Structured Output
+Final Output
 ```
+
+---
+
+# RAG Integration
+
+The system includes a real Retrieval-Augmented Generation (RAG) pipeline:
+
+- PDF ingestion using PyMuPDF
+- semantic chunking
+- embedding generation (sentence-transformers)
+- cosine similarity retrieval
+- context-grounded answer generation
+
+This is used inside the RAG Agent to provide document-aware insights.
 
 ---
 
 # Setup
 
-Clone repository:
-
 ```bash
 git clone <repo_url>
 cd multi-agent-orchestrator
-```
-
-Install dependencies:
-
-```bash
 pip install -r requirements.txt
 ```
 
@@ -92,22 +118,14 @@ MODEL_NAME=gemini-1.5-flash
 
 # API Usage
 
-Start server:
-
 ```bash
 uvicorn app.main:app --reload
 ```
 
-Endpoint:
-
-```text
-POST /plan
-POST /execute (if extended)
-```
-
-Example request:
+Example:
 
 ```json
+POST /plan
 {
   "query": "Summarize project and highlight risks and next actions"
 }
@@ -117,41 +135,38 @@ Example request:
 
 # CLI Usage
 
-Run from terminal:
-
 ```bash
 python -m app.cli --query "Summarize project and highlight risks and next actions"
 ```
 
-With document input:
+With document:
 
 ```bash
-python -m app.cli --query "Summarize project update" --file data/sample.pdf
+python -m app.cli --query "Summarize project" --file data/sample.pdf
 ```
 
 ---
 
 # Evaluation & Optimization
 
-This repository includes a multi-agent evaluation framework.
+The system includes a multi-agent evaluation framework.
 
-It evaluates:
-
-- planning accuracy
-- routing accuracy
-- agent output quality
-- final response quality
-
-Run evaluation:
+Run:
 
 ```bash
 python -m evaluation.evaluator
 ```
 
-Run optimization:
+Optimize:
 
 ```bash
 python -m evaluation.optimizer
+```
+
+This enables:
+
+```text
+Build → Evaluate → Diagnose → Improve
 ```
 
 ---
@@ -159,48 +174,30 @@ python -m evaluation.optimizer
 # Engineering Highlights
 
 - Multi-agent orchestration architecture
+- Real RAG integration
 - Deterministic planning and routing
-- Domain-specific agent design
-- Structured aggregation layer
-- Evaluation-driven AI system design
+- Structured aggregation
+- Evaluation-driven system design
 - Google Gemini integration
 
 ---
 
 # Google Ecosystem Alignment
 
-This repository aligns with modern AI system design patterns used with Google Gemini.
+This repository aligns with modern AI system patterns using Google Gemini.
 
 It demonstrates:
-
 - multi-step reasoning
 - agent-based workflows
-- structured AI orchestration
-- enterprise AI use cases
-
----
-
-# Design Philosophy
-
-This system is built as:
-
-```text
-modular, explainable, and production-minded AI system
-```
-
-Key principles:
-
-- clarity over complexity
-- deterministic orchestration
-- reusable agent design
-- measurable outputs
+- enterprise AI orchestration
+- structured decision systems
 
 ---
 
 # Limitations
 
 - no persistent memory
-- no real document RAG integration (simplified in agents)
+- synchronous execution
 - evaluation depends on embedding quality
 - no UI interface
 
@@ -208,20 +205,20 @@ Key principles:
 
 # Future Enhancements
 
-- integrate full RAG pipeline (Week 4 reuse)
-- add memory-enabled agents
-- introduce async agent execution
-- build UI interface
-- add multi-document workflows
+- memory-enabled agents
+- async orchestration
+- UI interface
+- multi-document workflows
+- hybrid retrieval (BM25 + vector)
 
 ---
 
 # Summary
 
-This repository demonstrates how to build:
+This repository demonstrates:
 
 ```text
-AI system that plans, delegates, executes, and synthesizes results using multiple agents
+AI system that plans, delegates, executes, retrieves, and synthesizes results using multiple agents
 ```
 
 ---
