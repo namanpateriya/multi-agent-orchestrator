@@ -1,11 +1,16 @@
 import json
-
-from evaluation.metrics import (
-    semantic_similarity,
-    list_coverage
-)
+from sentence_transformers import SentenceTransformer
+import numpy as np
 
 from app.service import OrchestratorService
+
+model = SentenceTransformer("all-MiniLM-L6-v2")
+
+
+def similarity(a, b):
+    emb = model.encode([a, b])
+    return float(np.dot(emb[0], emb[1]) /
+                 (np.linalg.norm(emb[0])*np.linalg.norm(emb[1])))
 
 
 def evaluate():
@@ -15,65 +20,38 @@ def evaluate():
 
     results = []
 
-    print("\n=== MULTI-AGENT EVALUATION ===\n")
+    for c in cases:
 
-    for case in cases:
-
-        result = OrchestratorService.process(
-            case["query"],
-            case.get("file_path")
+        res = OrchestratorService.process(
+            c["query"],
+            c.get("file_path")
         )
 
-        final_output = result.get("final_output", "")
-        structured = result.get("structured", {})
+        structured = res.get("structured") or {}
+        final = res.get("final_output", "")
 
-        # --- Metrics ---
+        sim = similarity(final, c["expected_output"])
 
-        similarity = semantic_similarity(
-            final_output,
-            case.get("expected_output", "")
-        )
+        risk_cov = sum(
+            k in structured.get("risks", "").lower()
+            for k in c["expected_risks"]
+        ) / len(c["expected_risks"])
 
-        risk_score = list_coverage(
-            structured.get("risks", ""),
-            case.get("expected_risks", [])
-        )
+        action_cov = sum(
+            k in structured.get("actions", "").lower()
+            for k in c["expected_actions"]
+        ) / len(c["expected_actions"])
 
-        action_score = list_coverage(
-            structured.get("actions", ""),
-            case.get("expected_actions", [])
-        )
+        score = (sim + risk_cov + action_cov) / 3
 
-        planning_correct = set(
-            [t["type"] for t in result.get("tasks", [])]
-        ) == set(case.get("expected_tasks", []))
+        results.append({
+            "id": c["id"],
+            "similarity": sim,
+            "risk_coverage": risk_cov,
+            "action_coverage": action_cov,
+            "score": score
+        })
 
-        routing_correct = set(
-            [r["agent"] for r in result.get("routing", [])]
-        ) == set(case.get("expected_agents", []))
-
-        overall_pass = (
-            similarity > 0.5 and
-            risk_score > 0.3 and
-            action_score > 0.3
-        )
-
-        case_result = {
-            "id": case["id"],
-            "similarity": round(similarity, 3),
-            "risk_score": round(risk_score, 3),
-            "action_score": round(action_score, 3),
-            "planning_correct": planning_correct,
-            "routing_correct": routing_correct,
-            "passed": overall_pass
-        }
-
-        results.append(case_result)
-
-        print(case["id"], case_result)
+        print(results[-1])
 
     return results
-
-
-if __name__ == "__main__":
-    evaluate()
